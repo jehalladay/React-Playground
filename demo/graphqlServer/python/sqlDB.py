@@ -43,7 +43,6 @@ class DB:
 
         return self
 
-
     def select_all(self, location: str):
         self.execute(f'''
             Select * FROM {location}
@@ -53,32 +52,45 @@ class DB:
 
         return data
 
+    def select_item(self, location: str, queryString: str):
+        self.execute(f'''Select * FROM {location} WHERE {queryString}''')
 
+        return self.fetch_all()
 
     def commit(self):
         self.connection.commit()
 
         return self
 
-
     def close(self):
         self.connection.close()
 
         return self
 
-# crs.execute('''
-# CREATE TABLE "Country" (
-# 	"Name"	TEXT NOT NULL,
-# 	"Year"	INTEGER NOT NULL,
-# 	"Population"	INTEGER NOT NULL
-# )
-# ''')
+    def create_table(self):
+        # crs.execute('''
+        # CREATE TABLE "Country" (
+        # 	"Name"	TEXT NOT NULL,
+        # 	"Year"	INTEGER NOT NULL,
+        # 	"Population"	INTEGER NOT NULL
+        # )
+        # ''')
+
+        return self
 
 
+
+def testSelect():
+    db = DB()
+    pop_data = db.select_all('Population')
+
+    assert(pop_data[-1][0] == 'Zimbabwe')
+    print('Population collection loads successfully')
+    
+    zimb = db.select_item('population', 'CountryName = "Zimbabwe"')
+
+    assert(zimb[0][0] == 'Zimbabwe')
+    print('Zimbabwe row loads successfully')
+
+testSelect()
 db = DB()
-
-pop_data = db.select_all('Population')
-
-for country in pop_data:
-
-    print(country, '\n') if country[0] == 'Zimbabwe' else None

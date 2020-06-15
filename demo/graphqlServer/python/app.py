@@ -15,7 +15,7 @@ def create_server():
 
 def graphqlSetup(app):
     schema: dict = {
-        
+        'name': 'Launch'
     }
 
     app.add_url_rule('/graphql', view_func=GraphQLView.as_view('graphql', schema=schema, graphiql=True))

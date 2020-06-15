@@ -1,0 +1,29 @@
+{
+  "name": "nsProxy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "npx babel --watch ./public/jsx --out-dir ./public/js/"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/cli": "^7.10.1",
+    "@babel/core": "^7.10.2",
+    "@babel/plugin-transform-react-jsx": "^7.10.1",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  },
+  "babel": {
+    "plugins": [
+      [
+        "@babel/plugin-transform-react-jsx",
+        {
+          "throwIfNamespace": false
+        }
+      ]
+    ]
+  }
+}
