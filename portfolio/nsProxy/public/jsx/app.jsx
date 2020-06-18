@@ -22,6 +22,10 @@ class Tester extends React.Component {
     }
 }
 
+const Value = 'hello:world';
+
+<Value></Value>
+
 ReactDOM.render(
     <div>
         <Tester>

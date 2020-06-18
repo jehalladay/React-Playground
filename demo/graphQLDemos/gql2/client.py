@@ -3,11 +3,9 @@ import requests
 
 q = """
 { 
-  website(url: "https://wikipedia.org") {
-    title
-    image
-    description
-  }
+    site1: website(url: "https://wikipedia.org") {
+        Name: title
+    }
 }
 """
 

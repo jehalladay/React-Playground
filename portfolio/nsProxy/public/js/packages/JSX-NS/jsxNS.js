@@ -26,8 +26,14 @@ React Namespace
             rd: reactDOM -> if ReactDOM exists in the global scope, this represents the ReactDOM namespace
 
         Included Namespaces for JSX Attributes:
-            No-Namespace  ----  default -> all attributes are props key/value pairs
+            No-Namespace  ----  default --  all attributes are props key/value pairs
 
+
+            d  ---------------  declarations  --  changes the way the proxy handles the namespace declaration
+                d:useChild              ::  string      ->  instead of using the namespaced function/object, use a designated child function/object
+                d:useNamespace          ::  string      ->  designate a namespace for the declaration 
+
+                
             f  ---------------  format  --  changes the way the proxy applies the props or children before applying them to the payload
                 f:shiftArg              ::  any         ->
                 f:pushArg               ::  any         ->
@@ -50,6 +56,7 @@ React Namespace
                 m:filterByKey           ::  function    ->  Function filters keys and returns an object with the remaining key/value pairs
                 m:filterByValue         ::  function    ->  Function filters values and returns an object with the remaining key/value pairs
                 m:filterChilren         ::  function    ->  Function filters children and returns new children array
+
 
             x  ---------------  behaviour --  changes the way the proxy encapsulates and delivers the payload
                 x:enclose               ::  bool        ->  return a function returning the payload
@@ -88,21 +95,17 @@ Namespaces:
     
 Register Namespaces:
 
-
-
-
-
 */
+
 
 
 /*  Register Namespaces  */
 
-function namespaceExists(){}
-function checkForNamespace(){}
 function registerReact(){}
 function registerReactDOM(){}
 function registerNamespace(namespace, nsItemDictionary){}
 function registerAttrNamespace(){}
+
 
 
 /*  Check if React and ReactDOM exist  */
@@ -113,16 +116,32 @@ function reactChecker() {
     } else { 
         globalThis.React = {
             createElement:  ()      => console.log('React does not exist within the global scope'),
-            Fragment:       (...x)  => x
+            Fragment:       (...x)  => x,
         }
     }
 }
 
 
 
+function reactDOMChecker() {
+    if(globalThis.ReactDOM) {
+        registerReactDOM()
+    }
+}
 
 
-const reactNS = React.createElement
+
+function jsxInit() {
+    if(!globalThis.__JSX_NAMESPACES__) {
+        globalThis.__JSX_NAMESPACES__      = {}
+        globalThis.__JSX_ATTR_NAMESPACES__ = {}
+        reactChecker()
+        reactDOMChecker()
+        
+    }
+}
+
+
 
 
 /**
@@ -136,12 +155,12 @@ const reactNS = React.createElement
  * function is used to catch all invokations of React.createElement 
  *      arguments are processed and checked for the namespace delimiter :
  *      
- * if the declaration is a string containing : it is 
+ * if the declaration is a string containing a colon : it is 
  *      determined to be namespaced and React.createElement is swapped out
  *      for a namespaced object/function/class that corresponds to the 
  *      namespace declared
  * 
- * if the props contain a key denoted by a string containing a : it
+ * if the props contains a key denoted by a string containing a colon : it
  *      is determined to be namespaced and the arguments and proxy 
  *      behaviour are altered as specified     
  */
@@ -185,9 +204,18 @@ const nsHandler = {
 
 
 const NS = {
-    createProxy: () => new Proxy(React.createElement, nsHandler),
     registerNamespace: registerNamespace,
-    registerAttrNamespace: registerAttrNamespace
+    registerAttrNamespace: registerAttrNamespace,
+    createProxy: (pragma) => {
+        const JSXElement = pragma || React.createElement
+        jsxInit()
+        return { createElement: new Proxy(JSXElement, nsHandler) }
+    },
+    createProxyShort: (pragma) => {
+        const JSXElement = pragma || React.createElement
+        jsxInit()
+        return new Proxy(JSXElement, nsHandler)
+    },
 }
 
 React.createElement = NS.createProxy()
